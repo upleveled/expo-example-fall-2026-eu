@@ -46,7 +46,7 @@
     "@types/node": "^26.6.5",
     "@types/react": "~19.3.0",
     "eslint": "^10.13.0",
-    "eslint-config-upleveled": "^11.0.2",
+    "eslint-config-upleveled": "^11.0.3",
     "libpg-query": "^18.1.5",
     "prettier": "^3.9.10",
     "prettier-plugin-embed": "^0.8.1",
