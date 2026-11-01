@@ -77,9 +77,11 @@ type User = {
 
 export async function loader(): Promise<User[]> {
   const response = await fetch('https://randomuser.me/api/?results=5');
+
   if (!response.ok) {
     throw new Error(`Random User API returned ${response.status}`);
   }
+
   const data = (await response.json()) as RandomUserApiResponseBody;
   return data.results.map((result) => {
     return {
