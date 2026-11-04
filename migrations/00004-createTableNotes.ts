@@ -13,13 +13,13 @@ export const noteSchema = z.object({
   note: z.object({
     title: z
       .string()
+      .trim()
       .min(1, 'Title must not be empty')
-      .max(100, 'Title must be maximum 100 characters')
-      .trim(),
+      .max(100, 'Title must be maximum 100 characters'),
     textContent: z
       .string()
-      .min(1, 'Text content must be minimum 1 character')
-      .trim(),
+      .trim()
+      .min(1, 'Text content must be minimum 1 character'),
   }),
 });
 

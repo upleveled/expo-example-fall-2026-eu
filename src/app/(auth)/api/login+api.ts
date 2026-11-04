@@ -21,6 +21,15 @@ export type LoginResponseBodyPost =
 export async function POST(
   request: Request,
 ): Promise<ExpoApiResponse<LoginResponseBodyPost>> {
+  if (
+    request.headers.get('content-type')?.split(';')[0] !== 'application/json'
+  ) {
+    return ExpoApiResponse.json(
+      { error: 'Content-Type must be application/json' },
+      { status: 415 },
+    );
+  }
+
   const requestBody = await request.json();
   const result = userSchemaLogin.safeParse(requestBody);
 

@@ -74,6 +74,7 @@ export const createUserInsecure = cache(
           ${username.toLowerCase()},
           ${passwordHash}
         )
+      ON CONFLICT (username) DO NOTHING
       RETURNING
         id,
         username

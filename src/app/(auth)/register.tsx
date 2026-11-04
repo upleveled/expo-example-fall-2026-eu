@@ -6,14 +6,7 @@ import {
   useLocalSearchParams,
 } from 'expo-router';
 import { useCallback, useState } from 'react';
-import {
-  Alert,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, fonts } from '../../constants/theme.ts';
 import type { UserResponseBodyGet } from '../api/user+api.ts';
@@ -64,6 +57,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginBottom: 12,
   },
+  error: {
+    color: colors.text,
+    fontFamily: fonts.body,
+    marginTop: 12,
+  },
   button: {
     backgroundColor: colors.text,
     borderRadius: 10,
@@ -99,6 +97,7 @@ const styles = StyleSheet.create({
 });
 
 export default function RegisterScreen() {
+  const [errorMessage, setErrorMessage] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const { returnTo } = useLocalSearchParams<{ returnTo?: string | string[] }>();
@@ -158,30 +157,37 @@ export default function RegisterScreen() {
             { opacity: pressed ? 0.7 : 1 },
           ]}
           onPress={async () => {
-            const response = await fetch('/api/register', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                user: { username, password },
-              }),
-            });
+            setErrorMessage('');
+            try {
+              const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  user: { username, password },
+                }),
+              });
 
-            const responseBody: RegisterResponseBodyPost =
-              await response.json();
+              const responseBody: RegisterResponseBodyPost =
+                await response.json();
 
-            if ('error' in responseBody) {
-              Alert.alert('Registration failed', responseBody.error);
-              return;
+              if ('error' in responseBody) {
+                setErrorMessage(responseBody.error);
+                return;
+              }
+
+              setUsername('');
+              setPassword('');
+
+              router.replace((safeReturnToPath || '/(tabs)/animals') as Href);
+            } catch (error) {
+              console.error(error);
+              setErrorMessage('Registration failed');
             }
-
-            setUsername('');
-            setPassword('');
-
-            router.replace((safeReturnToPath || '/(tabs)/animals') as Href);
           }}
         >
           <Text style={styles.buttonText}>Register</Text>
         </Pressable>
+        {!!errorMessage && <Text style={styles.error}>{errorMessage}</Text>}
         <View style={styles.footer}>
           <Text style={styles.footerText}>Already have an account?</Text>
           <Link

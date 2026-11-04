@@ -28,7 +28,11 @@ export async function GET(
 
   const parsedNoteId = Number(noteId);
 
-  if (!Number.isInteger(parsedNoteId)) {
+  if (
+    !Number.isInteger(parsedNoteId) ||
+    parsedNoteId < 1 ||
+    parsedNoteId > 2147483647
+  ) {
     return ExpoApiResponse.json(
       { error: `No note with id ${noteId} found` },
       { status: 404 },

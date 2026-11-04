@@ -14,7 +14,7 @@ export const getNotes = cache(async (sessionToken: Session['token']) => {
       notes
       INNER JOIN sessions ON (
         sessions.token = ${sessionToken}
-        AND sessions.user_id = notes.user_id
+        AND notes.user_id = sessions.user_id
         AND sessions.expiry_timestamp > now()
       )
     ORDER BY
@@ -33,7 +33,7 @@ export const getNote = cache(
         notes
         INNER JOIN sessions ON (
           sessions.token = ${sessionToken}
-          AND sessions.user_id = notes.user_id
+          AND notes.user_id = sessions.user_id
           AND sessions.expiry_timestamp > now()
         )
       WHERE
@@ -63,7 +63,7 @@ export const selectNoteExists = cache(
         AND sessions.expiry_timestamp > now()
     `;
 
-    return record ? record.exists : false;
+    return !!record && record.exists;
   },
 );
 
@@ -75,10 +75,10 @@ export const createNote = cache(
     const [note] = await sql<Note[]>`
       INSERT INTO
         notes (user_id, title, text_content)
-      -- Security: derive user_id from session token instead
-      -- of allowing user to choose which user_id they
-      -- assign the note to
       SELECT
+        -- Security: derive user_id from session token instead
+        -- of allowing user to choose which user_id they
+        -- assign the note to
         sessions.user_id,
         ${newNote.title},
         ${newNote.textContent}

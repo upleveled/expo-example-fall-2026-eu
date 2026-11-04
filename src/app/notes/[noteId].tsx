@@ -91,6 +91,7 @@ export default function NoteScreen() {
 
       loadNote().catch((error) => {
         console.error(error);
+        setErrorMessage('Loading note failed');
       });
     }, [noteId]),
   );

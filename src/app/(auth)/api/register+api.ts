@@ -24,6 +24,15 @@ export type RegisterResponseBodyPost =
 export async function POST(
   request: Request,
 ): Promise<ExpoApiResponse<RegisterResponseBodyPost>> {
+  if (
+    request.headers.get('content-type')?.split(';')[0] !== 'application/json'
+  ) {
+    return ExpoApiResponse.json(
+      { error: 'Content-Type must be application/json' },
+      { status: 415 },
+    );
+  }
+
   const requestBody = await request.json();
   const result = userSchemaRegister.safeParse(requestBody);
 
@@ -49,8 +58,8 @@ export async function POST(
 
   if (!user) {
     return ExpoApiResponse.json(
-      { error: 'Creating user failed' },
-      { status: 500 },
+      { error: 'Username already exists' },
+      { status: 400 },
     );
   }
 

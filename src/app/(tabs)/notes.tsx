@@ -32,6 +32,7 @@ const styles = StyleSheet.create({
 
 export default function NotesScreen() {
   const [notes, setNotes] = useState<Note[]>([]);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useFocusEffect(
     useCallback(() => {
@@ -46,15 +47,17 @@ export default function NotesScreen() {
         const body: NotesResponseBodyGet = await response.json();
 
         if ('error' in body) {
-          setNotes([]);
+          setErrorMessage(body.error);
           return;
         }
 
+        setErrorMessage('');
         setNotes(body.notes);
       }
 
       loadNotes().catch((error) => {
         console.error(error);
+        setErrorMessage('Loading notes failed');
       });
     }, []),
   );
@@ -64,7 +67,9 @@ export default function NotesScreen() {
       <Text style={styles.helperText}>
         Private notes are visible only to the logged-in user who created them.
       </Text>
-      {notes.length > 0 ? (
+      {errorMessage ? (
+        <Text style={styles.emptyState}>{errorMessage}</Text>
+      ) : notes.length > 0 ? (
         <FlatList
           data={notes}
           renderItem={({ item }) => <NoteItem note={item} />}

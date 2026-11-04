@@ -1,13 +1,6 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import {
-  Alert,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { colors, fonts } from '../../constants/theme.ts';
 import type { NotesResponseBodyPost } from '../api/notes/index+api.ts';
 
@@ -46,6 +39,11 @@ const styles = StyleSheet.create({
     minHeight: 140,
     textAlignVertical: 'top',
   },
+  error: {
+    color: colors.text,
+    fontFamily: fonts.body,
+    marginTop: 12,
+  },
   button: {
     marginTop: 14,
     backgroundColor: colors.text,
@@ -63,6 +61,7 @@ const styles = StyleSheet.create({
 });
 
 export default function NewNoteScreen() {
+  const [errorMessage, setErrorMessage] = useState('');
   const [title, setTitle] = useState('');
   const [textContent, setTextContent] = useState('');
 
@@ -100,33 +99,40 @@ export default function NewNoteScreen() {
             { opacity: pressed ? 0.7 : 1 },
           ]}
           onPress={async () => {
-            const response = await fetch('/api/notes', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                note: { title, textContent },
-              }),
-            });
+            setErrorMessage('');
+            try {
+              const response = await fetch('/api/notes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  note: { title, textContent },
+                }),
+              });
 
-            const body: NotesResponseBodyPost = await response.json();
+              const body: NotesResponseBodyPost = await response.json();
 
-            if ('error' in body) {
-              if (response.status === 401) {
-                router.replace('/login?returnTo=/notes/newNote');
+              if ('error' in body) {
+                if (response.status === 401) {
+                  router.replace('/login?returnTo=/notes/newNote');
+                  return;
+                }
+
+                setErrorMessage(body.error);
                 return;
               }
 
-              Alert.alert('Create note failed', body.error);
-              return;
+              setTitle('');
+              setTextContent('');
+              router.replace('/(tabs)/notes');
+            } catch (error) {
+              console.error(error);
+              setErrorMessage('Creating note failed');
             }
-
-            setTitle('');
-            setTextContent('');
-            router.replace('/(tabs)/notes');
           }}
         >
           <Text style={styles.buttonText}>Add Note</Text>
         </Pressable>
+        {!!errorMessage && <Text style={styles.error}>{errorMessage}</Text>}
       </View>
     </View>
   );
