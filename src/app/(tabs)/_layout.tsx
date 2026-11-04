@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Link, Tabs } from 'expo-router';
 import { StyleSheet, TouchableOpacity } from 'react-native';
-import { colors } from '../../constants/theme';
+import { colors } from '../../constants/theme.ts';
 
 const styles = StyleSheet.create({
   headerRight: {
@@ -47,6 +47,26 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="notes"
+        options={{
+          title: 'Notes',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'document-text' : 'document-text-outline'}
+              color={color as string}
+              size={22}
+            />
+          ),
+          headerRight: () => (
+            <Link href="/notes/newNote" asChild>
+              <TouchableOpacity style={styles.headerRight}>
+                <Ionicons name="add" color={colors.text} size={24} />
+              </TouchableOpacity>
+            </Link>
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="search"
         options={{
           headerShown: false,
@@ -54,6 +74,19 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'search' : 'search-outline'}
+              color={color as string}
+              size={22}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'person' : 'person-outline'}
               color={color as string}
               size={22}
             />
