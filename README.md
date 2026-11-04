@@ -6,15 +6,6 @@ This example is part of the curriculum for the [UpLeveled Full Stack Web Develop
 
 ![Screenshot of home screen, showing a list of animals](./screenshot-homescreen.avif)
 
-## Features
-
-- Register and log in with a username and hashed password
-- Keep users logged in with expiring sessions and HTTP-only cookies
-- Log out by deleting the session and cookie
-- Require authentication for animal APIs and screens
-- Create private notes and restrict access to their owners
-- Return users to the requested page after login
-
 ## Technologies
 
 - [React Native](https://reactnative.dev/)
