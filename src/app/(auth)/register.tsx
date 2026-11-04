@@ -9,12 +9,12 @@ import { useCallback, useState } from 'react';
 import {
   Alert,
   Pressable,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, fonts } from '../../constants/theme.ts';
 import type { UserResponseBodyGet } from '../api/user+api.ts';
 import type { RegisterResponseBodyPost } from './api/register+api.ts';
@@ -116,9 +116,7 @@ export default function RegisterScreen() {
         const responseBody: UserResponseBodyGet = await response.json();
 
         if ('user' in responseBody) {
-          router.replace(
-            (safeReturnToPath || '/(tabs)/animals') as Href,
-          );
+          router.replace((safeReturnToPath || '/(tabs)/animals') as Href);
         }
       }
 
@@ -179,9 +177,7 @@ export default function RegisterScreen() {
             setUsername('');
             setPassword('');
 
-            router.replace(
-              (safeReturnToPath || '/(tabs)/animals') as Href,
-            );
+            router.replace((safeReturnToPath || '/(tabs)/animals') as Href);
           }}
         >
           <Text style={styles.buttonText}>Register</Text>
