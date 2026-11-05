@@ -24,6 +24,7 @@ export type RegisterResponseBodyPost =
 export async function POST(
   request: Request,
 ): Promise<ExpoApiResponse<RegisterResponseBodyPost>> {
+  // Prevent cross-site form submissions from creating sessions
   if (
     request.headers.get('content-type')?.split(';')[0] !== 'application/json'
   ) {
