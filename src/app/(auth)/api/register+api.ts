@@ -58,7 +58,7 @@ export async function POST(
 
   if (!user) {
     return ExpoApiResponse.json(
-      { error: 'Username already exists' },
+      { error: 'User creation failed' },
       { status: 400 },
     );
   }
