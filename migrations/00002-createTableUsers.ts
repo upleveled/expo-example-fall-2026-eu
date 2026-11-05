@@ -21,7 +21,7 @@ export const userSchemaRegister = z.object({
       .string()
       .min(8, { error: 'Password must be minimum 8 characters' })
       .refine((password) => Buffer.byteLength(password, 'utf8') <= 72, {
-        error: 'Password must be maximum 72 bytes',
+        error: 'Password is too long',
       }),
   }),
 });
@@ -29,11 +29,7 @@ export const userSchemaRegister = z.object({
 export const userSchemaLogin = z.object({
   user: z.object({
     username: z.string(),
-    password: z
-      .string()
-      .refine((password) => Buffer.byteLength(password, 'utf8') <= 72, {
-        error: 'Password must be maximum 72 bytes',
-      }),
+    password: z.string(),
   }),
 });
 
