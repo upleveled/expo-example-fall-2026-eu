@@ -1,5 +1,5 @@
-import { router } from 'expo-router';
-import { useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -11,8 +11,8 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { colors, fonts } from '../../constants/theme';
-import type { AnimalsResponseBodyPost } from '../api/animals/index+api';
+import { colors, fonts } from '../../constants/theme.ts';
+import type { AnimalsResponseBodyPost } from '../api/animals/index+api.ts';
 
 const styles = StyleSheet.create({
   container: {
@@ -70,6 +70,22 @@ export default function NewAnimalScreen() {
   const [accessory, setAccessory] = useState('Bow tie');
   const [birthDate, setBirthDate] = useState('2022-01-15');
 
+  useFocusEffect(
+    useCallback(() => {
+      async function getUser() {
+        const response = await fetch('/api/user');
+
+        if (response.status === 401) {
+          router.replace('/login?returnTo=/animals/new');
+        }
+      }
+
+      getUser().catch((error) => {
+        console.error(error);
+      });
+    }, []),
+  );
+
   return (
     <View style={styles.container}>
       <KeyboardAvoidingView
@@ -125,6 +141,11 @@ export default function NewAnimalScreen() {
                   'Content-Type': 'application/json',
                 },
               });
+
+              if (response.status === 401) {
+                router.replace('/login?returnTo=/animals/new');
+                return;
+              }
 
               if (!response.ok) {
                 const body = (await response.json()) as AnimalsResponseBodyPost;

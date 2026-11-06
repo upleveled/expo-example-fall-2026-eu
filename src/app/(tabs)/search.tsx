@@ -9,9 +9,9 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { Animal } from '../../../migrations/00000-createTableAnimals';
-import { colors, fonts } from '../../constants/theme';
-import type { AnimalsResponseBodyGet } from '../api/animals/index+api';
+import type { Animal } from '../../../migrations/00000-createTableAnimals.ts';
+import { colors, fonts } from '../../constants/theme.ts';
+import type { AnimalsResponseBodyGet } from '../api/animals/index+api.ts';
 
 const styles = StyleSheet.create({
   container: {
@@ -82,6 +82,11 @@ export default function SearchScreen() {
     useCallback(() => {
       async function getAnimals() {
         const response = await fetch('/api/animals');
+        if (response.status === 401) {
+          setAnimals([]);
+          router.replace('/login?returnTo=/(tabs)/search');
+          return;
+        }
 
         if (!response.ok) {
           setAnimals([]);
@@ -89,13 +94,16 @@ export default function SearchScreen() {
         }
 
         const body = (await response.json()) as AnimalsResponseBodyGet;
+        if ('error' in body) {
+          throw new Error(body.error);
+        }
         setAnimals(body.animals);
       }
 
       getAnimals().catch((error) => {
         console.error(error);
       });
-    }, []),
+    }, [router]),
   );
 
   return (
