@@ -26,27 +26,23 @@ export async function GET(
     );
   }
 
-  const parsedNoteId = Number(params.noteId);
+  const noteId = Number(params.noteId);
 
-  if (
-    !Number.isInteger(parsedNoteId) ||
-    parsedNoteId < 1 ||
-    parsedNoteId > 2147483647
-  ) {
+  if (!Number.isInteger(noteId) || noteId < 1 || noteId > 2147483647) {
     return ExpoApiResponse.json(
       { error: `No note with id ${params.noteId} found` },
       { status: 404 },
     );
   }
 
-  if (!(await getNoteExistsInsecure(parsedNoteId))) {
+  if (!(await getNoteExistsInsecure(noteId))) {
     return ExpoApiResponse.json(
       { error: `No note with id ${params.noteId} found` },
       { status: 404 },
     );
   }
 
-  const note = await getNote(sessionToken, parsedNoteId);
+  const note = await getNote(sessionToken, noteId);
 
   // Security: This can be an antipattern for security, because of "information
   // exposure": it tells the user that a note with this id exists. Instead,
