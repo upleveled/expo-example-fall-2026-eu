@@ -22,7 +22,7 @@ export type AnimalResponseBodyGet =
 
 export async function GET(
   request: Request,
-  { animalId }: { animalId: string },
+  params: { animalId: string },
 ): Promise<ExpoApiResponse<AnimalResponseBodyGet>> {
   const cookies = parse(request.headers.get('cookie') || '');
   const sessionToken = cookies.sessionToken;
@@ -38,16 +38,16 @@ export async function GET(
     );
   }
 
-  const animal = await getAnimal(sessionToken, Number(animalId));
+  const animal = await getAnimal(sessionToken, Number(params.animalId));
 
   if (!animal) {
-    const existingAnimal = await getAnimalInsecure(Number(animalId));
+    const existingAnimal = await getAnimalInsecure(Number(params.animalId));
 
     return ExpoApiResponse.json(
       {
         error: existingAnimal
           ? 'Access denied'
-          : `No animal with id ${animalId} found`,
+          : `No animal with id ${params.animalId} found`,
       },
       {
         status: existingAnimal ? 403 : 404,
@@ -68,7 +68,7 @@ export type AnimalResponseBodyPut =
 
 export async function PUT(
   request: Request,
-  { animalId }: { animalId: string },
+  params: { animalId: string },
 ): Promise<ExpoApiResponse<AnimalResponseBodyPut>> {
   const cookies = parse(request.headers.get('cookie') || '');
   const sessionToken = cookies.sessionToken;
@@ -98,7 +98,7 @@ export async function PUT(
     );
   }
 
-  const existingAnimal = await getAnimalInsecure(Number(animalId));
+  const existingAnimal = await getAnimalInsecure(Number(params.animalId));
   if (!existingAnimal) {
     return ExpoApiResponse.json(
       {
@@ -109,7 +109,7 @@ export async function PUT(
   }
 
   const animal = await updateAnimal(sessionToken, {
-    id: Number(animalId),
+    id: Number(params.animalId),
     ...result.data.animal,
   });
 
@@ -137,7 +137,7 @@ export type AnimalResponseBodyDelete =
 
 export async function DELETE(
   request: Request,
-  { animalId }: { animalId: string },
+  params: { animalId: string },
 ): Promise<ExpoApiResponse<AnimalResponseBodyDelete>> {
   const cookies = parse(request.headers.get('cookie') || '');
   const sessionToken = cookies.sessionToken;
@@ -153,7 +153,7 @@ export async function DELETE(
     );
   }
 
-  const existingAnimal = await getAnimalInsecure(Number(animalId));
+  const existingAnimal = await getAnimalInsecure(Number(params.animalId));
   if (!existingAnimal) {
     return ExpoApiResponse.json(
       {
@@ -164,7 +164,7 @@ export async function DELETE(
   }
 
   const animal = await deleteAnimal(sessionToken, {
-    id: Number(animalId),
+    id: Number(params.animalId),
   });
 
   if (!animal) {

@@ -14,7 +14,7 @@ export type NoteResponseBodyGet =
 
 export async function GET(
   request: Request,
-  { noteId }: { noteId: string },
+  params: { noteId: string },
 ): Promise<ExpoApiResponse<NoteResponseBodyGet>> {
   const cookies = parse(request.headers.get('cookie') || '');
   const sessionToken = cookies.sessionToken;
@@ -26,7 +26,7 @@ export async function GET(
     );
   }
 
-  const parsedNoteId = Number(noteId);
+  const parsedNoteId = Number(params.noteId);
 
   if (
     !Number.isInteger(parsedNoteId) ||
@@ -34,14 +34,14 @@ export async function GET(
     parsedNoteId > 2147483647
   ) {
     return ExpoApiResponse.json(
-      { error: `No note with id ${noteId} found` },
+      { error: `No note with id ${params.noteId} found` },
       { status: 404 },
     );
   }
 
   if (!(await getNoteExistsInsecure(parsedNoteId))) {
     return ExpoApiResponse.json(
-      { error: `No note with id ${noteId} found` },
+      { error: `No note with id ${params.noteId} found` },
       { status: 404 },
     );
   }
@@ -54,7 +54,7 @@ export async function GET(
   // (replace 403 response with 404 response, remove getNoteExistsInsecure()).
   if (!note) {
     return ExpoApiResponse.json(
-      { error: `Access denied to note with id ${noteId}` },
+      { error: `Access denied to note with id ${params.noteId}` },
       { status: 403 },
     );
   }
