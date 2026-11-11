@@ -1,6 +1,6 @@
 import { getValidSession } from '../../../../database/sessions.ts';
 import { parse } from 'cookie';
-import { getNote, selectNoteExists } from '../../../../database/notes.ts';
+import { getNote, getNoteExistsInsecure } from '../../../../database/notes.ts';
 import { ExpoApiResponse } from '../../../../ExpoApiResponse.ts';
 import type { Note } from '../../../../migrations/00004-createTableNotes.ts';
 
@@ -39,7 +39,7 @@ export async function GET(
     );
   }
 
-  if (!(await selectNoteExists(sessionToken, parsedNoteId))) {
+  if (!(await getNoteExistsInsecure(parsedNoteId))) {
     return ExpoApiResponse.json(
       { error: `No note with id ${noteId} found` },
       { status: 404 },
@@ -51,7 +51,7 @@ export async function GET(
   // Security: This can be an antipattern for security, because of "information
   // exposure": it tells the user that a note with this id exists. Instead,
   // consider returning only the 404 Not Found response in both cases
-  // (replace 403 response with 404 response, remove selectNoteExists()).
+  // (replace 403 response with 404 response, remove getNoteExistsInsecure()).
   if (!note) {
     return ExpoApiResponse.json(
       { error: `Access denied to note with id ${noteId}` },

@@ -44,28 +44,20 @@ export const getNote = cache(
   },
 );
 
-export const selectNoteExists = cache(
-  async (sessionToken: Session['token'], noteId: Note['id']) => {
-    const [record] = await sql<{ exists: boolean }[]>`
-      SELECT
-        EXISTS (
-          SELECT
-            1
-          FROM
-            notes
-          WHERE
-            notes.id = ${noteId}
-        )
-      FROM
-        sessions
-      WHERE
-        sessions.token = ${sessionToken}
-        AND sessions.expiry_timestamp > now()
-    `;
-
-    return !!record && record.exists;
-  },
-);
+export const getNoteExistsInsecure = cache(async (noteId: Note['id']) => {
+  const [record] = await sql<{ exists: boolean }[]>`
+    SELECT
+      EXISTS (
+        SELECT
+          1
+        FROM
+          notes
+        WHERE
+          notes.id = ${noteId}
+      )
+  `;
+  return !!record?.exists;
+});
 
 export const createNote = cache(
   async (
