@@ -21,7 +21,16 @@ export async function GET(
   request: Request,
   params: { animalId: string },
 ): Promise<ExpoApiResponse<AnimalResponseBodyGet>> {
-  const animal = await getAnimalInsecure(Number(params.animalId));
+  const animalId = Number(params.animalId);
+
+  if (isNaN(animalId)) {
+    return ExpoApiResponse.json(
+      { error: 'Invalid animal id' },
+      { status: 400 },
+    );
+  }
+
+  const animal = await getAnimalInsecure(animalId);
 
   if (!animal) {
     return ExpoApiResponse.json(
@@ -49,6 +58,15 @@ export async function PUT(
   request: Request,
   params: { animalId: string },
 ): Promise<ExpoApiResponse<AnimalResponseBodyPut>> {
+  const animalId = Number(params.animalId);
+
+  if (isNaN(animalId)) {
+    return ExpoApiResponse.json(
+      { error: 'Invalid animal id' },
+      { status: 400 },
+    );
+  }
+
   const requestBody = await request.json();
   const result = animalSchema.safeParse(requestBody);
 
@@ -63,7 +81,7 @@ export async function PUT(
     );
   }
 
-  const existingAnimal = await getAnimalInsecure(Number(params.animalId));
+  const existingAnimal = await getAnimalInsecure(animalId);
   if (!existingAnimal) {
     return ExpoApiResponse.json(
       {
@@ -74,7 +92,7 @@ export async function PUT(
   }
 
   const animal = await updateAnimalInsecure({
-    id: Number(params.animalId),
+    id: animalId,
     ...result.data.animal,
   });
 
@@ -104,7 +122,16 @@ export async function DELETE(
   request: Request,
   params: { animalId: string },
 ): Promise<ExpoApiResponse<AnimalResponseBodyDelete>> {
-  const existingAnimal = await getAnimalInsecure(Number(params.animalId));
+  const animalId = Number(params.animalId);
+
+  if (isNaN(animalId)) {
+    return ExpoApiResponse.json(
+      { error: 'Invalid animal id' },
+      { status: 400 },
+    );
+  }
+
+  const existingAnimal = await getAnimalInsecure(animalId);
   if (!existingAnimal) {
     return ExpoApiResponse.json(
       {
@@ -115,7 +142,7 @@ export async function DELETE(
   }
 
   const animal = await deleteAnimalInsecure({
-    id: Number(params.animalId),
+    id: animalId,
   });
 
   if (!animal) {
