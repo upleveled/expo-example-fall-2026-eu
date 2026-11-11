@@ -19,7 +19,8 @@ export const noteSchema = z.object({
     textContent: z
       .string()
       .trim()
-      .min(1, 'Text content must be minimum 1 character'),
+      .min(1, 'Text content must be minimum 1 character')
+      .max(1000, { error: 'Text content must be maximum 1000 characters' }),
   }),
 });
 
