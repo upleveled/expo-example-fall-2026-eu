@@ -1,11 +1,11 @@
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { Animal } from '../../../migrations/00000-createTableAnimals';
-import AnimalItem from '../../components/AnimalItem';
-import { colors } from '../../constants/theme';
-import type { AnimalsResponseBodyGet } from '../api/animals/index+api';
+import type { Animal } from '../../../migrations/00000-createTableAnimals.ts';
+import AnimalItem from '../../components/AnimalItem.tsx';
+import { colors } from '../../constants/theme.ts';
+import type { AnimalsResponseBodyGet } from '../api/animals/index+api.ts';
 
 const styles = StyleSheet.create({
   container: {
@@ -41,12 +41,20 @@ export default function AnimalsScreen() {
       async function getAnimals() {
         const response = await fetch('/api/animals');
 
+        if (response.status === 401) {
+          router.replace('/login?returnTo=/(tabs)/animals');
+          return;
+        }
+
         if (!response.ok) {
           setAnimals([]);
           return;
         }
 
         const body = (await response.json()) as AnimalsResponseBodyGet;
+        if ('error' in body) {
+          throw new Error(body.error);
+        }
         setAnimals(body.animals);
       }
 

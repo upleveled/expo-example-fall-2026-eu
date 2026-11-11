@@ -1,35 +1,27 @@
-import {
-  createAnimalInsecure,
-  getAnimalsInsecure,
-} from '../../../../database/animals';
-import { ExpoApiResponse } from '../../../../ExpoApiResponse';
+import { parse } from 'cookie';
+import { getValidSession } from '../../../../database/sessions.ts';
+import { createAnimal, getAnimals } from '../../../../database/animals.ts';
+import { ExpoApiResponse } from '../../../../ExpoApiResponse.ts';
 import {
   type Animal,
   animalSchema,
-} from '../../../../migrations/00000-createTableAnimals';
+} from '../../../../migrations/00000-createTableAnimals.ts';
 
-export type AnimalsResponseBodyGet = {
-  animals: Animal[];
-};
+export type AnimalsResponseBodyGet = { animals: Animal[] } | { error: string };
 
 export async function GET(
   request: Request,
 ): Promise<ExpoApiResponse<AnimalsResponseBodyGet>> {
-  const cookie = request.headers.get('cookie');
-  console.log('cookie:', cookie);
-
-  const animals = await getAnimalsInsecure();
-
-  return ExpoApiResponse.json(
-    {
-      animals: animals,
-    },
-    {
-      headers: {
-        'Set-Cookie': 'test=123; Path=/',
-      },
-    },
-  );
+  const cookies = parse(request.headers.get('cookie') || '');
+  const sessionToken = cookies.sessionToken;
+  if (!sessionToken || !(await getValidSession(sessionToken))) {
+    return ExpoApiResponse.json(
+      { error: 'Authentication required' },
+      { status: 401 },
+    );
+  }
+  const animals = await getAnimals(sessionToken);
+  return ExpoApiResponse.json({ animals });
 }
 
 export type AnimalsResponseBodyPost =
@@ -43,6 +35,20 @@ export type AnimalsResponseBodyPost =
 export async function POST(
   request: Request,
 ): Promise<ExpoApiResponse<AnimalsResponseBodyPost>> {
+  const cookies = parse(request.headers.get('cookie') || '');
+  const sessionToken = cookies.sessionToken;
+
+  if (!sessionToken || !(await getValidSession(sessionToken))) {
+    return ExpoApiResponse.json(
+      {
+        error: 'Authentication required',
+      },
+      {
+        status: 401,
+      },
+    );
+  }
+
   const requestBody = await request.json();
   const result = animalSchema.safeParse(requestBody);
 
@@ -57,7 +63,7 @@ export async function POST(
     );
   }
 
-  const animal = await createAnimalInsecure(result.data.animal);
+  const animal = await createAnimal(sessionToken, result.data.animal);
 
   if (!animal) {
     return ExpoApiResponse.json(
@@ -65,7 +71,7 @@ export async function POST(
         error: 'Error creating animal',
       },
       {
-        status: 500,
+        status: 401,
       },
     );
   }

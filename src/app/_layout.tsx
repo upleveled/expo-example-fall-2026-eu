@@ -6,7 +6,7 @@ import {
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import { colors } from '@/constants/theme';
+import { colors } from '@/constants/theme.ts';
 
 SplashScreen.preventAutoHideAsync().catch((splashScreenError) => {
   console.error(
@@ -39,6 +39,7 @@ export default function RootLayout() {
         <Stack.Screen name="index" options={{ headerShown: false }} />
       </Stack.Protected>
 
+      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
       <Stack.Screen
@@ -60,6 +61,24 @@ export default function RootLayout() {
           headerStyle: { backgroundColor: colors.background },
           presentation: 'modal',
           animation: 'slide_from_bottom',
+        }}
+      />
+      <Stack.Screen
+        name="notes/newNote"
+        options={{
+          title: 'New Note',
+          presentation: 'modal',
+          headerTintColor: colors.text,
+          headerStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="notes/[noteId]"
+        options={{
+          title: 'Note',
+          presentation: 'modal',
+          headerTintColor: colors.text,
+          headerStyle: { backgroundColor: colors.background },
         }}
       />
     </Stack>

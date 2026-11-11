@@ -3,12 +3,19 @@ import { Image } from 'expo-image';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
 // import icon from '../../../assets/images/icon.png';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { colors, fonts } from '../../constants/theme';
+import {
+  Alert,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import { colors, fonts } from '../../constants/theme.ts';
 import type {
   AnimalResponseBodyGet,
   AnimalResponseBodyPut,
-} from '../api/animals/[animalId]+api';
+} from '../api/animals/[animalId]+api.ts';
 
 const styles = StyleSheet.create({
   container: {
@@ -92,6 +99,10 @@ export default function AnimalScreen() {
         if (typeof animalId !== 'string') return;
 
         const response = await fetch(`/api/animals/${animalId}`);
+        if (response.status === 401) {
+          router.replace(`/login?returnTo=/animals/${animalId}`);
+          return;
+        }
         if (!response.ok) {
           return;
         }
@@ -151,6 +162,12 @@ export default function AnimalScreen() {
                 },
               });
               if (!response.ok) {
+                if (response.status === 401) {
+                  router.replace(`/login?returnTo=/animals/${animalId}`);
+                  return;
+                }
+
+                Alert.alert('Error', 'Cannot update animal');
                 return;
               }
 
@@ -214,6 +231,12 @@ export default function AnimalScreen() {
                 method: 'DELETE',
               });
               if (!response.ok) {
+                if (response.status === 401) {
+                  router.replace(`/login?returnTo=/animals/${animalId}`);
+                  return;
+                }
+
+                Alert.alert('Error', 'Cannot delete animal');
                 return;
               }
 
