@@ -48,6 +48,10 @@ export async function GET(
 
   const note = await getNote(sessionToken, parsedNoteId);
 
+  // Security: This can be an antipattern for security, because of "information
+  // exposure": it tells the user that a note with this id exists. Instead,
+  // consider returning only the 404 Not Found response in both cases
+  // (replace 403 response with 404 response, remove selectNoteExists()).
   if (!note) {
     return ExpoApiResponse.json(
       { error: `Access denied to note with id ${noteId}` },
