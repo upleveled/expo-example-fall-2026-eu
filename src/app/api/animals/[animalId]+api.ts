@@ -19,14 +19,14 @@ export type AnimalResponseBodyGet =
 
 export async function GET(
   request: Request,
-  { animalId }: { animalId: string },
+  params: { animalId: string },
 ): Promise<ExpoApiResponse<AnimalResponseBodyGet>> {
-  const animal = await getAnimalInsecure(Number(animalId));
+  const animal = await getAnimalInsecure(Number(params.animalId));
 
   if (!animal) {
     return ExpoApiResponse.json(
       {
-        error: `No animal with id ${animalId} found`,
+        error: `No animal with id ${params.animalId} found`,
       },
       {
         status: 404,
@@ -47,7 +47,7 @@ export type AnimalResponseBodyPut =
 
 export async function PUT(
   request: Request,
-  { animalId }: { animalId: string },
+  params: { animalId: string },
 ): Promise<ExpoApiResponse<AnimalResponseBodyPut>> {
   const requestBody = await request.json();
   const result = animalSchema.safeParse(requestBody);
@@ -63,7 +63,7 @@ export async function PUT(
     );
   }
 
-  const existingAnimal = await getAnimalInsecure(Number(animalId));
+  const existingAnimal = await getAnimalInsecure(Number(params.animalId));
   if (!existingAnimal) {
     return ExpoApiResponse.json(
       {
@@ -74,7 +74,7 @@ export async function PUT(
   }
 
   const animal = await updateAnimalInsecure({
-    id: Number(animalId),
+    id: Number(params.animalId),
     ...result.data.animal,
   });
 
@@ -102,9 +102,9 @@ export type AnimalResponseBodyDelete =
 
 export async function DELETE(
   request: Request,
-  { animalId }: { animalId: string },
+  params: { animalId: string },
 ): Promise<ExpoApiResponse<AnimalResponseBodyDelete>> {
-  const existingAnimal = await getAnimalInsecure(Number(animalId));
+  const existingAnimal = await getAnimalInsecure(Number(params.animalId));
   if (!existingAnimal) {
     return ExpoApiResponse.json(
       {
@@ -115,7 +115,7 @@ export async function DELETE(
   }
 
   const animal = await deleteAnimalInsecure({
-    id: Number(animalId),
+    id: Number(params.animalId),
   });
 
   if (!animal) {
