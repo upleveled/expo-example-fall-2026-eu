@@ -24,6 +24,15 @@ export async function GET(
   request: Request,
   params: { animalId: string },
 ): Promise<ExpoApiResponse<AnimalResponseBodyGet>> {
+  const animalId = Number(params.animalId);
+
+  if (isNaN(animalId)) {
+    return ExpoApiResponse.json(
+      { error: 'Invalid animal id' },
+      { status: 400 },
+    );
+  }
+
   const cookies = parse(request.headers.get('cookie') || '');
   const sessionToken = cookies.sessionToken;
 
@@ -38,10 +47,10 @@ export async function GET(
     );
   }
 
-  const animal = await getAnimal(sessionToken, Number(params.animalId));
+  const animal = await getAnimal(sessionToken, animalId);
 
   if (!animal) {
-    const existingAnimal = await getAnimalInsecure(Number(params.animalId));
+    const existingAnimal = await getAnimalInsecure(animalId);
 
     return ExpoApiResponse.json(
       {
@@ -70,6 +79,15 @@ export async function PUT(
   request: Request,
   params: { animalId: string },
 ): Promise<ExpoApiResponse<AnimalResponseBodyPut>> {
+  const animalId = Number(params.animalId);
+
+  if (isNaN(animalId)) {
+    return ExpoApiResponse.json(
+      { error: 'Invalid animal id' },
+      { status: 400 },
+    );
+  }
+
   const cookies = parse(request.headers.get('cookie') || '');
   const sessionToken = cookies.sessionToken;
 
@@ -98,7 +116,7 @@ export async function PUT(
     );
   }
 
-  const existingAnimal = await getAnimalInsecure(Number(params.animalId));
+  const existingAnimal = await getAnimalInsecure(animalId);
   if (!existingAnimal) {
     return ExpoApiResponse.json(
       {
@@ -109,7 +127,7 @@ export async function PUT(
   }
 
   const animal = await updateAnimal(sessionToken, {
-    id: Number(params.animalId),
+    id: animalId,
     ...result.data.animal,
   });
 
@@ -139,6 +157,15 @@ export async function DELETE(
   request: Request,
   params: { animalId: string },
 ): Promise<ExpoApiResponse<AnimalResponseBodyDelete>> {
+  const animalId = Number(params.animalId);
+
+  if (isNaN(animalId)) {
+    return ExpoApiResponse.json(
+      { error: 'Invalid animal id' },
+      { status: 400 },
+    );
+  }
+
   const cookies = parse(request.headers.get('cookie') || '');
   const sessionToken = cookies.sessionToken;
 
@@ -153,7 +180,7 @@ export async function DELETE(
     );
   }
 
-  const existingAnimal = await getAnimalInsecure(Number(params.animalId));
+  const existingAnimal = await getAnimalInsecure(animalId);
   if (!existingAnimal) {
     return ExpoApiResponse.json(
       {
@@ -164,7 +191,7 @@ export async function DELETE(
   }
 
   const animal = await deleteAnimal(sessionToken, {
-    id: Number(params.animalId),
+    id: animalId,
   });
 
   if (!animal) {
